@@ -8,8 +8,8 @@ def main():
     load_dotenv()
     ACCESS_TOKEN_VK = os.environ.get('ACCESS_TOKEN_VK')
     GROUP_ID = int(os.environ.get('GROUP_ID'))
-    image_path = 'Images/comix.png'
-    text_path = 'Images/comix.txt'
+    image_path = 'comix.png'
+    text_path = 'comix.txt'
     version = '5.131'
     fetch_comix(image_path, text_path)
     upload_server_url = 'https://api.vk.com/method/photos.getWallUploadServer'
@@ -18,17 +18,13 @@ def main():
     params = {'access_token': ACCESS_TOKEN_VK, 'v': version,
               'group_id': GROUP_ID,
               }
-    upload_response = requests.get(upload_server_url, params)
-    upload_response.raise_for_status()
-    upload_url = upload_response.json()['response']['upload_url']
-    with open('images/comix.png', 'rb') as file:
+    upload_url = get_upload_url(upload_server_url, params)
+    with open(image_path, 'rb') as file:
         image_url = upload_url
-        files = {
+        file = {
             'photo': file,
             }
-        upload_response = requests.post(image_url, files=files)
-        upload_response.raise_for_status()
-    uploaded_image = upload_response.json()
+        uploaded_image = upload_image(image_url, file)
     save_params = {'group_id': GROUP_ID,
                    'photo': uploaded_image['photo'],
                    'server': uploaded_image['server'],
@@ -36,9 +32,10 @@ def main():
                    'access_token': ACCESS_TOKEN_VK,
                    'v': version
                    }
-    save_response = requests.post(save_url, params=save_params)
-    owner_id = save_response.json()['response'][0]['owner_id']
-    media_id = save_response.json()['response'][0]['id']
+    #save_response = requests.post(save_url, params=save_params)
+    #owner_id = save_response.json()['response'][0]['owner_id']
+    #media_id = save_response.json()['response'][0]['id']
+    owner_id, media_id = save_image(save_url, save_params)
     with open(text_path, 'r') as file:
         image_comment = file.read()
     post_params = {'access_token': ACCESS_TOKEN_VK,
@@ -51,6 +48,28 @@ def main():
     requests.post(post_url, post_params)
     delete_file(image_path)
     delete_file(text_path)
+
+
+def get_upload_url(url, params):
+    upload_response = requests.get(url, params)
+    upload_response.raise_for_status()
+    upload_url = upload_response.json()['response']['upload_url']    
+    return upload_url
+
+
+def upload_image(url, file):
+    upload_response = requests.post(url, files=file)
+    upload_response.raise_for_status()
+    uploaded_image = upload_response.json()
+    return uploaded_image
+
+
+def save_image(url, params):
+    save_response = requests.post(url, params=params)
+    save_response.raise_for_status()
+    owner_id = save_response.json()['response'][0]['owner_id']
+    media_id = save_response.json()['response'][0]['id']
+    return owner_id, media_id
 
 
 def get_image(url, filename, params=''):
