@@ -7,16 +7,16 @@ from dotenv import load_dotenv
 def main():
     load_dotenv()
     ACCESS_TOKEN_VK = os.environ.get('ACCESS_TOKEN_VK')
+    GROUP_ID = int(os.environ.get('GROUP_ID'))
     image_path = 'Images/comix.png'
     text_path = 'Images/comix.txt'
     version = '5.131'
     fetch_comix(image_path, text_path)
-    group_id = 219248441
     upload_server_url = 'https://api.vk.com/method/photos.getWallUploadServer'
     save_url = 'https://api.vk.com/method/photos.saveWallPhoto'
     post_url = 'https://api.vk.com/method/wall.post'
     params = {'access_token': ACCESS_TOKEN_VK, 'v': version,
-              'group_id': group_id,
+              'group_id': GROUP_ID,
               }
     upload_response = requests.get(upload_server_url, params)
     upload_response.raise_for_status()
@@ -29,7 +29,7 @@ def main():
         upload_response = requests.post(image_url, files=files)
         upload_response.raise_for_status()
     uploaded_image = upload_response.json()
-    save_params = {'group_id': group_id,
+    save_params = {'group_id': GROUP_ID,
                    'photo': uploaded_image['photo'],
                    'server': uploaded_image['server'],
                    'hash': uploaded_image['hash'],
@@ -43,7 +43,7 @@ def main():
         image_comment = file.read()
     post_params = {'access_token': ACCESS_TOKEN_VK,
                    'v': version,
-                   'owner_id': -group_id,
+                   'owner_id': -GROUP_ID,
                    'message': image_comment,
                    'attachments': f'photo{owner_id}_{media_id}',
                    'from_group': 1
