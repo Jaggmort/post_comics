@@ -64,8 +64,9 @@ def save_image(group_id, uploaded_image, vk_access_token, version):
     url = 'https://api.vk.com/method/photos.saveWallPhoto'    
     save_response = requests.post(url, params=save_params)
     save_response.raise_for_status()
-    owner_id = save_response.json()['response'][0]['owner_id']
-    media_id = save_response.json()['response'][0]['id']
+    json_save_response = save_response.json()
+    owner_id = json_save_response['response'][0]['owner_id']
+    media_id = json_save_response['response'][0]['id']
     return owner_id, media_id
 
 
@@ -85,8 +86,9 @@ def fetch_comix(image_path, text_path):
     current_url = f'https://xkcd.com/{random_index}/info.0.json'
     response = requests.get(current_url)
     response.raise_for_status()
-    image_link = response.json()['img']
-    image_comment = response.json()['alt']
+    json_response = response.json
+    image_link = json_response['img']
+    image_comment = json_response['alt']
     with open(text_path, 'w') as file:
         file.write(image_comment)
     get_image(image_link, image_path)
