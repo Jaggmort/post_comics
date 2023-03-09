@@ -11,28 +11,30 @@ def main():
     image_path = 'comix.png'
     text_path = 'comix.txt'
     version = '5.131'
-    fetch_comix(image_path, text_path)
-    post_url = 'https://api.vk.com/method/wall.post'
-    upload_url = get_upload_url(vk_access_token, version, group_id)
-    with open(image_path, 'rb') as file:
-        image_url = upload_url
-        file = {
-            'photo': file,
-            }
-        uploaded_image = upload_image(image_url, file)
-    owner_id, media_id = save_image((group_id, uploaded_image, vk_access_token, version))
-    with open(text_path, 'r') as file:
-        image_comment = file.read()
-    post_params = {'access_token': vk_access_token,
-                   'v': version,
-                   'owner_id': -group_id,
-                   'message': image_comment,
-                   'attachments': f'photo{owner_id}_{media_id}',
-                   'from_group': 1
-                   }
-    requests.post(post_url, post_params)
-    delete_file(image_path)
-    delete_file(text_path)
+    try:
+        fetch_comix(image_path, text_path)
+        post_url = 'https://api.vk.com/method/wall.post'
+        upload_url = get_upload_url(vk_access_token, version, group_id)
+        with open(image_path, 'rb') as file:
+            image_url = upload_url
+            file = {
+                'photo': file,
+                }
+            uploaded_image = upload_image(image_url, file)
+        owner_id, media_id = save_image((group_id, uploaded_image, vk_access_token, version))
+        with open(text_path, 'r') as file:
+            image_comment = file.read()
+        post_params = {'access_token': vk_access_token,
+                    'v': version,
+                    'owner_id': -group_id,
+                    'message': image_comment,
+                    'attachments': f'photo{owner_id}_{media_id}',
+                    'from_group': 1
+                    }
+        requests.post(post_url, post_params)
+    finally:
+        delete_file(image_path)
+        delete_file(text_path)
 
 
 def get_upload_url(vk_access_token, version, group_id):
@@ -86,7 +88,7 @@ def fetch_comix(image_path, text_path):
     current_url = f'https://xkcd.com/{random_index}/info.0.json'
     response = requests.get(current_url)
     response.raise_for_status()
-    json_response = response.json
+    json_response = response.json()
     image_link = json_response['img']
     image_comment = json_response['alt']
     with open(text_path, 'w') as file:
