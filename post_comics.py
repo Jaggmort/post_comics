@@ -32,9 +32,6 @@ def main():
                    'access_token': ACCESS_TOKEN_VK,
                    'v': version
                    }
-    #save_response = requests.post(save_url, params=save_params)
-    #owner_id = save_response.json()['response'][0]['owner_id']
-    #media_id = save_response.json()['response'][0]['id']
     owner_id, media_id = save_image(save_url, save_params)
     with open(text_path, 'r') as file:
         image_comment = file.read()
