@@ -15,10 +15,23 @@ def main():
         post_url = 'https://api.vk.com/method/wall.post'
         upload_url = get_upload_url(vk_access_token, version, group_id)
         uploaded_image = upload_image(upload_url, image_path)
-        owner_id, media_id = save_image((group_id, uploaded_image, vk_access_token, version))
-        post_comics(post_url, image_comment, vk_access_token, version, group_id, f'photo{owner_id}_{media_id}')
+        owner_id, media_id = save_image(group_id,
+                                        uploaded_image,
+                                        vk_access_token,
+                                        version
+                                        )
+        post_comics(post_url, image_comment, vk_access_token,
+                    version,
+                    group_id,
+                    f'photo{owner_id}_{media_id}'
+                    )
     finally:
         delete_file(image_path)
+
+
+def check_vk_answer(json):
+    if json['error']:
+        raise Exception(json['error']['error_msg'])
 
 
 def get_upload_url(vk_access_token, version, group_id):
@@ -28,28 +41,38 @@ def get_upload_url(vk_access_token, version, group_id):
               }
     upload_response = requests.get(url, params=params)
     upload_response.raise_for_status()
-    upload_url = upload_response.json()['response']['upload_url']    
+    upload_json = upload_response.json()
+    check_vk_answer(upload_json)
+    upload_url = upload_json['response']['upload_url']
     return upload_url
 
 
-def post_comics(url, image_comment, vk_access_token, version, group_id, photo_ids):
+def post_comics(url, image_comment, vk_access_token,
+                version,
+                group_id,
+                photo_ids
+                ):
         post_params = {'access_token': vk_access_token,
-                    'v': version,
-                    'owner_id': -group_id,
-                    'message': image_comment,
-                    'attachments': photo_ids,
-                    'from_group': 1
-                    }
-        requests.post(url, post_params)
+                       'v': version,
+                       'owner_id': -group_id,
+                       'message': image_comment,
+                       'attachments': photo_ids,
+                       'from_group': 1
+                       }
+        response = requests.post(url, post_params)
+        json = response.json()
+        check_vk_answer(json)
+
 
 def upload_image(url, image_path):
     with open(image_path, 'rb') as file:
         file = {
                 'photo': file,
-                }  
-    upload_response = requests.post(url, files=file)
+                }
+        upload_response = requests.post(url, files=file)
     upload_response.raise_for_status()
     uploaded_image = upload_response.json()
+    check_vk_answer(uploaded_image)
     return uploaded_image
 
 
@@ -60,11 +83,12 @@ def save_image(group_id, uploaded_image, vk_access_token, version):
                    'hash': uploaded_image['hash'],
                    'access_token': vk_access_token,
                    'v': version
-                   }    
-    url = 'https://api.vk.com/method/photos.saveWallPhoto'    
+                   }
+    url = 'https://api.vk.com/method/photos.saveWallPhoto'
     save_response = requests.post(url, params=save_params)
     save_response.raise_for_status()
     json_save_response = save_response.json()
+    check_vk_answer(json_save_response)
     owner_id = json_save_response['response'][0]['owner_id']
     media_id = json_save_response['response'][0]['id']
     return owner_id, media_id
