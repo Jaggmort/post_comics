@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 
 def main():
     load_dotenv()
-    access_token_vk = os.environ.get('ACCESS_TOKEN_VK')
+    vk_access_token = os.environ.get('ACCESS_TOKEN_VK')
     group_id = int(os.environ.get('GROUP_ID'))
     image_path = 'comix.png'
     text_path = 'comix.txt'
@@ -15,7 +15,7 @@ def main():
     upload_server_url = 'https://api.vk.com/method/photos.getWallUploadServer'
     save_url = 'https://api.vk.com/method/photos.saveWallPhoto'
     post_url = 'https://api.vk.com/method/wall.post'
-    params = {'access_token': access_token_vk, 'v': version,
+    params = {'access_token': vk_access_token, 'v': version,
               'group_id': group_id,
               }
     upload_url = get_upload_url(upload_server_url, params)
@@ -29,13 +29,13 @@ def main():
                    'photo': uploaded_image['photo'],
                    'server': uploaded_image['server'],
                    'hash': uploaded_image['hash'],
-                   'access_token': access_token_vk,
+                   'access_token': vk_access_token,
                    'v': version
                    }
     owner_id, media_id = save_image(save_url, save_params)
     with open(text_path, 'r') as file:
         image_comment = file.read()
-    post_params = {'access_token': access_token_vk,
+    post_params = {'access_token': vk_access_token,
                    'v': version,
                    'owner_id': -group_id,
                    'message': image_comment,
@@ -79,8 +79,8 @@ def get_image(url, filename, params=''):
 
 def fetch_comix(image_path, text_path):
     base_url = 'https://xkcd.com/info.0.json'
-    response_num = requests.get(base_url)
-    maximum_images = response_num.json()['num']
+    base_response = requests.get(base_url)
+    maximum_images = base_response.json()['num']
     random_index = random.randint(0, maximum_images)
     current_url = f'https://xkcd.com/{random_index}/info.0.json'
     response = requests.get(current_url)
