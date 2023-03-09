@@ -12,13 +12,11 @@ def main():
     text_path = 'comix.txt'
     version = '5.131'
     fetch_comix(image_path, text_path)
-    upload_server_url = 'https://api.vk.com/method/photos.getWallUploadServer'
-    save_url = 'https://api.vk.com/method/photos.saveWallPhoto'
     post_url = 'https://api.vk.com/method/wall.post'
     params = {'access_token': vk_access_token, 'v': version,
               'group_id': group_id,
               }
-    upload_url = get_upload_url(upload_server_url, params)
+    upload_url = get_upload_url(params)
     with open(image_path, 'rb') as file:
         image_url = upload_url
         file = {
@@ -32,7 +30,7 @@ def main():
                    'access_token': vk_access_token,
                    'v': version
                    }
-    owner_id, media_id = save_image(save_url, save_params)
+    owner_id, media_id = save_image(save_params)
     with open(text_path, 'r') as file:
         image_comment = file.read()
     post_params = {'access_token': vk_access_token,
@@ -47,7 +45,8 @@ def main():
     delete_file(text_path)
 
 
-def get_upload_url(url, params):
+def get_upload_url(params):
+    url = 'https://api.vk.com/method/photos.getWallUploadServer'
     upload_response = requests.get(url, params)
     upload_response.raise_for_status()
     upload_url = upload_response.json()['response']['upload_url']    
@@ -61,7 +60,8 @@ def upload_image(url, file):
     return uploaded_image
 
 
-def save_image(url, params):
+def save_image(params):
+    url = 'https://api.vk.com/method/photos.saveWallPhoto'    
     save_response = requests.post(url, params=params)
     save_response.raise_for_status()
     owner_id = save_response.json()['response'][0]['owner_id']
