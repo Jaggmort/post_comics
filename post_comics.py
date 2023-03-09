@@ -98,8 +98,6 @@ def fetch_comix(image_path, text_path):
 def delete_file(file_path):
     if os.path.exists(file_path):
         os.remove(file_path)
-    else:
-        print("Can not delete the file as it doesn't exists")
 
 
 if __name__ == '__main__':
