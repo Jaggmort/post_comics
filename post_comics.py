@@ -6,8 +6,8 @@ from dotenv import load_dotenv
 
 def main():
     load_dotenv()
-    ACCESS_TOKEN_VK = os.environ.get('ACCESS_TOKEN_VK')
-    GROUP_ID = int(os.environ.get('GROUP_ID'))
+    access_token_vk = os.environ.get('ACCESS_TOKEN_VK')
+    group_id = int(os.environ.get('GROUP_ID'))
     image_path = 'comix.png'
     text_path = 'comix.txt'
     version = '5.131'
@@ -15,8 +15,8 @@ def main():
     upload_server_url = 'https://api.vk.com/method/photos.getWallUploadServer'
     save_url = 'https://api.vk.com/method/photos.saveWallPhoto'
     post_url = 'https://api.vk.com/method/wall.post'
-    params = {'access_token': ACCESS_TOKEN_VK, 'v': version,
-              'group_id': GROUP_ID,
+    params = {'access_token': access_token_vk, 'v': version,
+              'group_id': group_id,
               }
     upload_url = get_upload_url(upload_server_url, params)
     with open(image_path, 'rb') as file:
@@ -25,19 +25,19 @@ def main():
             'photo': file,
             }
         uploaded_image = upload_image(image_url, file)
-    save_params = {'group_id': GROUP_ID,
+    save_params = {'group_id': group_id,
                    'photo': uploaded_image['photo'],
                    'server': uploaded_image['server'],
                    'hash': uploaded_image['hash'],
-                   'access_token': ACCESS_TOKEN_VK,
+                   'access_token': access_token_vk,
                    'v': version
                    }
     owner_id, media_id = save_image(save_url, save_params)
     with open(text_path, 'r') as file:
         image_comment = file.read()
-    post_params = {'access_token': ACCESS_TOKEN_VK,
+    post_params = {'access_token': access_token_vk,
                    'v': version,
-                   'owner_id': -GROUP_ID,
+                   'owner_id': -group_id,
                    'message': image_comment,
                    'attachments': f'photo{owner_id}_{media_id}',
                    'from_group': 1
