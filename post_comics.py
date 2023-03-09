@@ -9,18 +9,16 @@ def main():
     vk_access_token = os.environ.get('VK_ACCESS_TOKEN')
     group_id = int(os.environ.get('VK_GROUP_ID'))
     image_path = 'comix.png'
-    text_path = 'comix.txt'
     version = '5.131'
     try:
-        fetch_comix(image_path, text_path)
+        image_comment = fetch_comix(image_path)
         post_url = 'https://api.vk.com/method/wall.post'
         upload_url = get_upload_url(vk_access_token, version, group_id)
         uploaded_image = upload_image(upload_url, image_path)
         owner_id, media_id = save_image((group_id, uploaded_image, vk_access_token, version))
-        post_comics(post_url, text_path, vk_access_token, version, group_id, f'photo{owner_id}_{media_id}')
+        post_comics(post_url, image_comment, vk_access_token, version, group_id, f'photo{owner_id}_{media_id}')
     finally:
         delete_file(image_path)
-        delete_file(text_path)
 
 
 def get_upload_url(vk_access_token, version, group_id):
@@ -34,9 +32,7 @@ def get_upload_url(vk_access_token, version, group_id):
     return upload_url
 
 
-def post_comics(url, text_path, vk_access_token, version, group_id, photo_ids):
-        with open(text_path, 'r') as file:
-            image_comment = file.read()
+def post_comics(url, image_comment, vk_access_token, version, group_id, photo_ids):
         post_params = {'access_token': vk_access_token,
                     'v': version,
                     'owner_id': -group_id,
@@ -79,10 +75,9 @@ def get_image(url, filename, params=''):
     response.raise_for_status()
     with open(filename, 'wb') as file:
         file.write(response.content)
-    return
 
 
-def fetch_comix(image_path, text_path):
+def fetch_comix(image_path):
     base_url = 'https://xkcd.com/info.0.json'
     base_response = requests.get(base_url)
     maximum_images = base_response.json()['num']
@@ -93,10 +88,8 @@ def fetch_comix(image_path, text_path):
     json_response = response.json()
     image_link = json_response['img']
     image_comment = json_response['alt']
-    with open(text_path, 'w') as file:
-        file.write(image_comment)
     get_image(image_link, image_path)
-    return
+    return image_comment
 
 
 def delete_file(file_path):
