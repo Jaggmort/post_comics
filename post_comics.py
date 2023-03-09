@@ -15,23 +15,9 @@ def main():
         fetch_comix(image_path, text_path)
         post_url = 'https://api.vk.com/method/wall.post'
         upload_url = get_upload_url(vk_access_token, version, group_id)
-        with open(image_path, 'rb') as file:
-            image_url = upload_url
-            file = {
-                'photo': file,
-                }
-            uploaded_image = upload_image(image_url, file)
+        uploaded_image = upload_image(upload_url, image_path)
         owner_id, media_id = save_image((group_id, uploaded_image, vk_access_token, version))
-        with open(text_path, 'r') as file:
-            image_comment = file.read()
-        post_params = {'access_token': vk_access_token,
-                    'v': version,
-                    'owner_id': -group_id,
-                    'message': image_comment,
-                    'attachments': f'photo{owner_id}_{media_id}',
-                    'from_group': 1
-                    }
-        requests.post(post_url, post_params)
+        post_comics(post_url, text_path, vk_access_token, version, group_id, f'photo{owner_id}_{media_id}')
     finally:
         delete_file(image_path)
         delete_file(text_path)
@@ -48,7 +34,23 @@ def get_upload_url(vk_access_token, version, group_id):
     return upload_url
 
 
-def upload_image(url, file):
+def post_comics(url, text_path, vk_access_token, version, group_id, photo_ids):
+        with open(text_path, 'r') as file:
+            image_comment = file.read()
+        post_params = {'access_token': vk_access_token,
+                    'v': version,
+                    'owner_id': -group_id,
+                    'message': image_comment,
+                    'attachments': photo_ids,
+                    'from_group': 1
+                    }
+        requests.post(url, post_params)
+
+def upload_image(url, image_path):
+    with open(image_path, 'rb') as file:
+        file = {
+                'photo': file,
+                }  
     upload_response = requests.post(url, files=file)
     upload_response.raise_for_status()
     uploaded_image = upload_response.json()
