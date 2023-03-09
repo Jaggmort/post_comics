@@ -6,8 +6,8 @@ from dotenv import load_dotenv
 
 def main():
     load_dotenv()
-    vk_access_token = os.environ.get('ACCESS_TOKEN_VK')
-    group_id = int(os.environ.get('GROUP_ID'))
+    vk_access_token = os.environ.get('VK_ACCESS_TOKEN')
+    group_id = int(os.environ.get('VK_GROUP_ID'))
     image_path = 'comix.png'
     text_path = 'comix.txt'
     version = '5.131'
