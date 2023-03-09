@@ -11,7 +11,7 @@ pip install -r requirements.txt
 
 U should put in .env correct infomation:
 
-```GROUP_ID - Id of VK group``` ```ACCESS_TOKEN_VK - VK_Token that got rights to post```
+```VK_GROUP_ID - Id of VK group``` ```VK_ACCESS_TOKEN - VK_Token that got rights to post```
 
 ### How to use ###
 ```python
