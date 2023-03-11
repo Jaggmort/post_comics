@@ -14,8 +14,13 @@ def main():
         image_comment = fetch_comix(image_path)
         upload_url = get_upload_url(vk_access_token, version, group_id)
         uploaded_image = upload_image(upload_url, image_path)
+        photo = upload_image['photo']
+        server = upload_image['server']
+        hash = upload_image['hash']
         owner_id, media_id = save_image(group_id,
-                                        uploaded_image,
+                                        photo,
+                                        server,
+                                        hash,
                                         vk_access_token,
                                         version
                                         )
@@ -76,11 +81,11 @@ def upload_image(url, image_path):
     return uploaded_image
 
 
-def save_image(group_id, uploaded_image, vk_access_token, version):
+def save_image(group_id, photo, server, hash, vk_access_token, version):
     save_params = {'group_id': group_id,
-                   'photo': uploaded_image['photo'],
-                   'server': uploaded_image['server'],
-                   'hash': uploaded_image['hash'],
+                   'photo': photo,
+                   'server': server,
+                   'hash': hash,
                    'access_token': vk_access_token,
                    'v': version
                    }
