@@ -41,9 +41,9 @@ def get_upload_url(vk_access_token, version, group_id):
               }
     upload_response = requests.get(url, params=params)
     upload_response.raise_for_status()
-    upload_json = upload_response.json()
-    check_vk_answer(upload_json)
-    upload_url = upload_json['response']['upload_url']
+    decoded_upload_response = upload_response.json()
+    check_vk_answer(decoded_upload_response)
+    upload_url = decoded_upload_response['response']['upload_url']
     return upload_url
 
 
@@ -60,8 +60,8 @@ def post_comics(url, image_comment, vk_access_token,
                        'from_group': 1
                        }
         response = requests.post(url, post_params)
-        json = response.json()
-        check_vk_answer(json)
+        decoded_response = response.json()
+        check_vk_answer(decoded_response)
 
 
 def upload_image(url, image_path):
@@ -87,10 +87,10 @@ def save_image(group_id, uploaded_image, vk_access_token, version):
     url = 'https://api.vk.com/method/photos.saveWallPhoto'
     save_response = requests.post(url, params=save_params)
     save_response.raise_for_status()
-    json_save_response = save_response.json()
-    check_vk_answer(json_save_response)
-    owner_id = json_save_response['response'][0]['owner_id']
-    media_id = json_save_response['response'][0]['id']
+    decoded_save_response = save_response.json()
+    check_vk_answer(decoded_save_response)
+    owner_id = decoded_save_response['response'][0]['owner_id']
+    media_id = decoded_save_response['response'][0]['id']
     return owner_id, media_id
 
 
@@ -109,9 +109,9 @@ def fetch_comix(image_path):
     current_url = f'https://xkcd.com/{random_index}/info.0.json'
     response = requests.get(current_url)
     response.raise_for_status()
-    json_response = response.json()
-    image_link = json_response['img']
-    image_comment = json_response['alt']
+    decoded_response = response.json()
+    image_link = decoded_response['img']
+    image_comment = decoded_response['alt']
     get_image(image_link, image_path)
     return image_comment
 
