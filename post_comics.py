@@ -12,7 +12,6 @@ def main():
     version = '5.131'
     try:
         image_comment = fetch_comix(image_path)
-        post_url = 'https://api.vk.com/method/wall.post'
         upload_url = get_upload_url(vk_access_token, version, group_id)
         uploaded_image = upload_image(upload_url, image_path)
         owner_id, media_id = save_image(group_id,
@@ -20,7 +19,7 @@ def main():
                                         vk_access_token,
                                         version
                                         )
-        post_comics(post_url, image_comment, vk_access_token,
+        post_comics(image_comment, vk_access_token,
                     version,
                     group_id,
                     f'photo{owner_id}_{media_id}'
@@ -47,11 +46,12 @@ def get_upload_url(vk_access_token, version, group_id):
     return upload_url
 
 
-def post_comics(url, image_comment, vk_access_token,
+def post_comics(image_comment, vk_access_token,
                 version,
                 group_id,
                 photo_ids
                 ):
+        url = 'https://api.vk.com/method/wall.post'        
         post_params = {'access_token': vk_access_token,
                        'v': version,
                        'owner_id': -group_id,
