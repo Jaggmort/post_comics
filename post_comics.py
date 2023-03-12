@@ -33,9 +33,9 @@ def main():
         delete_file(image_path)
 
 
-def check_vk_answer(decoded):
-    if decoded['error']:
-        raise Exception(decoded['error']['error_msg'])
+def check_vk_answer(decoded_response):
+    if decoded_response['error']:
+        raise Exception(decoded_response['error']['error_msg'])
 
 
 def get_upload_url(vk_access_token, version, group_id):
