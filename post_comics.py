@@ -81,11 +81,11 @@ def upload_image(url, image_path):
     return uploaded_image
 
 
-def save_image(group_id, photo, server, hash, vk_access_token, version):
+def save_image(group_id, photo, server, image_hash, vk_access_token, version):
     save_params = {'group_id': group_id,
                    'photo': photo,
                    'server': server,
-                   'hash': hash,
+                   'hash': image_hash,
                    'access_token': vk_access_token,
                    'v': version
                    }
